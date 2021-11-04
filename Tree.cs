@@ -85,7 +85,7 @@ namespace RedBlackTree
 
             TreeNode newNode = FindPlaceAndInsert(_root, key);
             newNode.Color = "Red";
-            if (newNode )
+            BalanseAndRepainting(newNode);
 
             AmountOfElements++;
         }
@@ -122,6 +122,107 @@ namespace RedBlackTree
             }
             return null;
         }
+
+        private void SwapFamilyColor(TreeNode node)
+        {
+            //Свап цвета применяется тогда, когда у parentNode два красных потомка.
+            //Потомки становятся черными, а parentNode - красным.
+
+            node.Color = "Red";
+            node.Left.Color = "Black";
+            node.Right.Color = "Black";
+
+            if (node == _root) node.Color = "Black";
+        }
+
+        private void SwapColour(TreeNode node)
+        {
+            if (node.Color == "Red") node.Color = "Black";
+            else node.Color = "Red";
+        }
+
+        private void LeftHandTurn(TreeNode child, TreeNode parent)
+        {
+            //левосторонний поворот просходит только тогда, когда цвет childNode - красный
+            parent.Right = child.Left;
+            child.Left = parent;
+            child.Color = parent.Color;
+            parent.Color = "Red";
+            if (_root == parent) _root = child;
+
+            ChangeParent(child, parent);
+        }
+
+        private void RightHandTurn(TreeNode child, TreeNode parent)
+        {
+            parent.Left = child.Right;
+            child.Right = parent;
+            child.Color = parent.Color;
+            parent.Color = "Red";
+            if (_root == parent) _root = child;
+
+            ChangeParent(child, parent);
+        }
+
+        private void ChangeParent(TreeNode child, TreeNode parent)
+        {
+            if (parent.Parent.Exists)
+            {
+                TreeNode grandParent = parent.Parent;
+                if (grandParent.Left == parent) grandParent.Left = child;
+                else grandParent.Right = child;
+
+                child.Parent = grandParent;
+                parent.Parent = child;
+            }
+        }
+
+        private void BalanseAndRepainting(TreeNode insertedNode)
+        {
+            //если левая нода красная и левая нода левой ноды красная - правосторонний поворот
+            //если правая нода красная и правая нода правой ноды красная - левосторонний поворот
+            //если левая нода красная и правосторонняя нода красная -делаем свап цвета.
+            if (insertedNode == _root) return;
+
+            TreeNode parent = insertedNode.Parent;
+            if (parent.Color == "Black" && 
+                (parent.Left.Exists && parent.Left.Color == "Red") && 
+                (parent.Right.Exists && parent.Right.Color == "Red") &&
+                (!(parent.Parent.Exists && parent.Parent.Color == "Red")))
+            {
+                SwapFamilyColor(parent);
+                return;
+            }
+
+            if (insertedNode.Color == "Red")
+            {
+                if (parent.Color == "Red")
+                {
+                    if (parent.Left == insertedNode)
+                    {
+                        RightHandTurn(parent, parent.Parent);
+                    }
+                    else
+                    {
+                        LeftHandTurn(parent, parent.Parent);
+                    }
+                    return;
+                }
+
+                if (insertedNode.Left.Exists && insertedNode.Left.Color == "Red")
+                {
+                    RightHandTurn(insertedNode, parent);
+                    return;
+                }
+
+                if (insertedNode.Right.Exists && insertedNode.Right.Color == "Red")
+                {
+                    LeftHandTurn(insertedNode, parent);
+                    return;
+                }
+            }
+        }
+
 
         public bool Delete(int key)
         {

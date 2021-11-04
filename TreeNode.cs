@@ -14,9 +14,12 @@ namespace RedBlackTree
         public TreeNode Parent { get; set; }
         public string Color { get; set; }
 
+        public bool Exists { get; set; }
+
         public TreeNode(int key)
         {
             Key = key;
+            Exists = true;
         }
 
         public int CompareTo(TreeNode other)
