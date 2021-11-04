@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RedBlackTree
 {
-    class Tree
+    public class Tree
     {
         private TreeNode _root;
         public int AmountOfElements { get; private set; }
@@ -15,12 +15,21 @@ namespace RedBlackTree
 
         public Tree()
         {
-            AmountOfElements = 5;
+            Insert(4);
+            Insert(45);
+            Insert(34);
+            Insert(23);
+            //Insert(1234);
+            //Insert(9);
+            //Insert(10);
+            //Insert(345);
+            //Insert(0);
+            //Insert(5);
         }
 
-        public void PrintTree()
+        public void SeeCool()
         {
-
+            _root.Print(textFormat: "(0)", spacing: 2);
         }
 
         public TreeNode Search(int key)
@@ -95,11 +104,21 @@ namespace RedBlackTree
         private TreeNode FindPlaceAndInsert(TreeNode node, int value)
         {
             //Случай 1: Вставляемое значение меньше значения узла
-            if (value.CompareTo(node.Key) < 0)
+            if (value < node.Key)
             {
                 if (node.Left == null)
                 {
                     node.Left = new TreeNode(value);
+                    node.Left.Parent = node;
+                    return node.Left;
+                }
+                if (node.Left.Key < value)
+                {
+                    TreeNode tmp = node.Left;
+                    node.Left = new TreeNode(value);
+                    node.Left.Parent = node;
+                    node.Left.Left = tmp;
+                    tmp.Parent = node.Left;
                     return node.Left;
                 }
                 else
@@ -113,6 +132,16 @@ namespace RedBlackTree
                 if (node.Right == null)
                 {
                     node.Right = new TreeNode(value);
+                    node.Right.Parent = node;
+                    return node.Right;
+                }
+                if (node.Right.Key > value)
+                {
+                    TreeNode tmp = node.Right;
+                    node.Right = new TreeNode(value);
+                    node.Right.Parent = node;
+                    node.Right.Right = tmp;
+                    tmp.Parent = node.Right;
                     return node.Right;
                 }
                 else
@@ -166,13 +195,18 @@ namespace RedBlackTree
 
         private void ChangeParent(TreeNode child, TreeNode parent)
         {
-            if (parent.Parent.Exists)
+            if (parent.Parent != null)
             {
                 TreeNode grandParent = parent.Parent;
                 if (grandParent.Left == parent) grandParent.Left = child;
                 else grandParent.Right = child;
 
                 child.Parent = grandParent;
+                parent.Parent = child;
+            }
+            else
+            {
+                child.Parent = null;
                 parent.Parent = child;
             }
         }
@@ -186,9 +220,9 @@ namespace RedBlackTree
 
             TreeNode parent = insertedNode.Parent;
             if (parent.Color == "Black" && 
-                (parent.Left.Exists && parent.Left.Color == "Red") && 
-                (parent.Right.Exists && parent.Right.Color == "Red") &&
-                (!(parent.Parent.Exists && parent.Parent.Color == "Red")))
+                (parent.Left != null && parent.Left.Color == "Red") && 
+                (parent.Right != null && parent.Right.Color == "Red") &&
+                (!(parent.Parent != null && parent.Parent.Color == "Red")))
             {
                 SwapFamilyColor(parent);
                 return;
@@ -209,13 +243,13 @@ namespace RedBlackTree
                     return;
                 }
 
-                if (insertedNode.Left.Exists && insertedNode.Left.Color == "Red")
+                if (insertedNode.Left != null && insertedNode.Left.Color == "Red")
                 {
                     RightHandTurn(insertedNode, parent);
                     return;
                 }
 
-                if (insertedNode.Right.Exists && insertedNode.Right.Color == "Red")
+                if (insertedNode.Right != null && insertedNode.Right.Color == "Red")
                 {
                     LeftHandTurn(insertedNode, parent);
                     return;
@@ -223,218 +257,59 @@ namespace RedBlackTree
             }
         }
 
-
-        public bool Delete(int key)
+        public void BFS()
         {
-            TreeNode current, parent;
-
-            // Находим удаляемый узел.
-            current = Search(key);
-            parent = current.Parent;
-
-            if (current == null)
+            Console.WriteLine("Breadth first (BFS): ");
+            Queue<TreeNode> visited = BreadthFirstSearch();
+            while (visited.Any())
             {
-                //нет узла с таким значением
-                return false;
-            }
-
-            //Случай 1: Если нет детей справа,
-            //левый ребенок встает на место удаляемого.
-            if (current.Right == null)
-            {
-                DeleteIfNoRightChildren(parent, current);
-            }
-
-            //Случай 2: Если у правого ребенка нет детей слева
-            //то он занимает место удаляемого узла.
-            else if (current.Right.Left == null)
-            {
-                DeleteIfRightChildHaveNoLeftChildren(parent, current);
-            }
-
-            //Случай 3: Если у правого ребенка есть дети слева,
-            //крайний левый ребенок 
-            //из правого поддерева заменяет удаляемый узел.
-            else
-            {
-                DeleteIfFullFamily(parent, current);
-            }
-            AmountOfElements--;
-            return true;
-        }
-
-        private void DeleteRed(TreeNode current, TreeNode parent)
-        {
-            // Удаление красной вершины с 0 детьми
-            if (current.Left == null && current.Right == null)
-            {
-                DeleteRedNoChildren(current, parent);
-            }
-
-
-            // Удаление красной вершины с 1 ребенком
-            else if (current.Left != null ^ current.Right != null)
-            {
-                DeleteRedOneChild(current, parent);
-            }
-
-            // Удаление красной с двумя детьми
-
-        }
-
-
-        private void DeleteRedNoChildren(TreeNode current, TreeNode parent)
-        {
-            if (parent.Left == current) parent.Left = null;
-            else parent.Right = null;
-            AmountOfElements--;
-        }
-
-        private void DeleteRedOneChild(TreeNode current, TreeNode parent)
-        {
-            //никаких проблем не возникнет, тк и ребенок и родитель точно чёрные
-            if (current.Left != null)
-            {
-                if (parent.Left == current) parent.Left = current.Left;
-                else parent.Right = current.Left;
-            }
-            if (current.Right != null)
-            {
-                if (parent.Left == current) parent.Left = current.Right;
-                else parent.Right = current.Right;
+                Console.Write($"{visited.Dequeue().Key} ");
             }
         }
 
-        private void DeleteBlack(TreeNode current, TreeNode parent)
+        //Dequeue: извлекает и возвращает первый элемент очереди
+
+        //Enqueue: добавляет элемент в конец очереди
+
+        //Peek: просто возвращает первый элемент из начала очереди без его удаления
+
+        private Queue<TreeNode> BreadthFirstSearch()
         {
-            if (current.Color == "Black" && (current.Left != null ^ current.Right != null))
+            Queue<TreeNode> notVisited = new Queue<TreeNode>();
+            notVisited.Enqueue(_root);
+            Queue<TreeNode> visited = new Queue<TreeNode>();
+
+            TreeNode shovel;
+            while (notVisited.Any())
             {
-                DeleteBlackOneChild(current, parent);
+                shovel = notVisited.Dequeue();
+                Console.WriteLine(" " + shovel.Key);
+                visited.Enqueue(shovel);
+                if (shovel.Left != null)
+                    notVisited.Enqueue(shovel.Left);
+                if (shovel.Right != null)
+                    notVisited.Enqueue(shovel.Right);
             }
-
-        }
-
-        private void DeleteBlackOneChild(TreeNode current, TreeNode parent)
-        {
-            if (current.Left != null && current.Left.Color == "Red")
-            {
-                if (parent.Left == current) parent.Left = current.Left;
-                else parent.Right = current.Left;
-
-                current.Left.Color = "Black";
-            }
-
-            else if (current.Right != null && current.Right.Color == "Red")
-            {
-                if (parent.Left == current) parent.Left = current.Right;
-                else parent.Right = current.Right;
-
-                current.Right.Color = "Black";
-            }
+            return visited;
         }
 
 
 
+        //        • КЛП — «корень - левый - правый» (обход в прямом порядке):
 
+        //посетить корень
+        //обойти левое поддерево
+        //обойти правое поддерево
+        //• ЛКП — «левый - корень - правый» (симметричный обход):
 
+        //обойти левое поддерево
+        //посетить корень
+        //обойти правое поддерево
+        //• ЛПК — «левый - правый - корень» (обход в обратном порядке):
 
-
-
-
-
-        private void DeleteIfNoRightChildren(TreeNode parent, TreeNode current)
-        {
-            if (parent == null)
-            {
-                _root = current.Left;
-            }
-            else
-            {
-                if (parent.Key > current.Key)
-                {
-                    //левый ребенок текущего узла становится левым ребенком родителя.
-                    parent.Left = current.Left;
-                }
-                else if (parent.Key < current.Key)
-                {
-                    //левый ребенок текущего узла становится правым ребенком родителя.
-                    parent.Right = current.Left;
-                }
-            }
-        }
-
-        private void DeleteIfRightChildHaveNoLeftChildren(TreeNode parent, TreeNode current)
-        {
-            current.Right.Left = current.Left;
-            if (parent == null)
-            {
-                _root = current.Right;
-            }
-            else
-            {
-                if (parent.Key > current.Key)
-                {
-                    //правый ребенок текущего узла становится левым ребенком родителя.
-                    parent.Left = current.Right;
-                }
-                else if (parent.Key < current.Key)
-                {
-                    //правый ребенок текущего узла становится правым ребенком родителя.
-                    parent.Right = current.Right;
-                }
-            }
-        }
-
-        private void DeleteIfFullFamily(TreeNode parent, TreeNode current)
-        {
-            //Найдем крайний левый узел.
-            TreeNode leftmost = current.Right.Left;
-            TreeNode leftmostParent = current.Right;
-            while (leftmost.Left != null)
-            {
-                leftmostParent = leftmost; leftmost = leftmost.Left;
-            }
-            //Левое поддерево родителя становится правым поддеревом
-            //крайнего левого узла.
-            leftmostParent.Left = leftmost.Right;
-            //Левый и правый ребенок текущего узла становится левым
-            //и правым ребенком крайнего левого.
-            leftmost.Left = current.Left;
-            leftmost.Right = current.Right;
-
-            if (parent == null)
-            {
-                _root = leftmost;
-            }
-            else
-            {
-                if (parent.Key > current.Key)
-                {
-                    //крайний левый узел становится левым ребенком родителя.
-                    parent.Left = leftmost;
-                }
-                else if (parent.Key < current.Key)
-                {
-                    //крайний левый узел становится правым ребенком родителя.
-                    parent.Right = leftmost;
-                }
-            }
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        //обойти левое поддерево
+        //обойти правое поддерево
+        //посетить корень
 
     }
 }

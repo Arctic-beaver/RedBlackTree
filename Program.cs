@@ -6,7 +6,10 @@ namespace RedBlackTree
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Tree tree = new Tree();
+            //tree.See();
+            //tree.BFS();
+            tree.SeeCool();
         }
     }
 }

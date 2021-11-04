@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RedBlackTree
 {
-    class TreeNode
+    public class TreeNode
     {
         public int Key { get; set; }
         public TreeNode Left { get; set; }
@@ -14,12 +14,9 @@ namespace RedBlackTree
         public TreeNode Parent { get; set; }
         public string Color { get; set; }
 
-        public bool Exists { get; set; }
-
         public TreeNode(int key)
         {
             Key = key;
-            Exists = true;
         }
 
         public int CompareTo(TreeNode other)
