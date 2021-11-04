@@ -263,6 +263,85 @@ namespace RedBlackTree
             return true;
         }
 
+        private void DeleteRed(TreeNode current, TreeNode parent)
+        {
+            // Удаление красной вершины с 0 детьми
+            if (current.Left == null && current.Right == null)
+            {
+                DeleteRedNoChildren(current, parent);
+            }
+
+
+            // Удаление красной вершины с 1 ребенком
+            else if (current.Left != null ^ current.Right != null)
+            {
+                DeleteRedOneChild(current, parent);
+            }
+
+            // Удаление красной с двумя детьми
+
+        }
+
+
+        private void DeleteRedNoChildren(TreeNode current, TreeNode parent)
+        {
+            if (parent.Left == current) parent.Left = null;
+            else parent.Right = null;
+            AmountOfElements--;
+        }
+
+        private void DeleteRedOneChild(TreeNode current, TreeNode parent)
+        {
+            //никаких проблем не возникнет, тк и ребенок и родитель точно чёрные
+            if (current.Left != null)
+            {
+                if (parent.Left == current) parent.Left = current.Left;
+                else parent.Right = current.Left;
+            }
+            if (current.Right != null)
+            {
+                if (parent.Left == current) parent.Left = current.Right;
+                else parent.Right = current.Right;
+            }
+        }
+
+        private void DeleteBlack(TreeNode current, TreeNode parent)
+        {
+            if (current.Color == "Black" && (current.Left != null ^ current.Right != null))
+            {
+                DeleteBlackOneChild(current, parent);
+            }
+
+        }
+
+        private void DeleteBlackOneChild(TreeNode current, TreeNode parent)
+        {
+            if (current.Left != null && current.Left.Color == "Red")
+            {
+                if (parent.Left == current) parent.Left = current.Left;
+                else parent.Right = current.Left;
+
+                current.Left.Color = "Black";
+            }
+
+            else if (current.Right != null && current.Right.Color == "Red")
+            {
+                if (parent.Left == current) parent.Left = current.Right;
+                else parent.Right = current.Right;
+
+                current.Right.Color = "Black";
+            }
+        }
+
+
+
+
+
+
+
+
+
+
         private void DeleteIfNoRightChildren(TreeNode parent, TreeNode current)
         {
             if (parent == null)
@@ -341,6 +420,19 @@ namespace RedBlackTree
                 }
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
