@@ -289,13 +289,9 @@ namespace RedBlackTree
             {
                 Console.Write($"{visited.Dequeue().Key} ");
             }
+            Console.WriteLine();
         }
 
-        //Dequeue: извлекает и возвращает первый элемент очереди
-
-        //Enqueue: добавляет элемент в конец очереди
-
-        //Peek: просто возвращает первый элемент из начала очереди без его удаления
 
         private Queue<TreeNode> BreadthFirstSearch()
         {
@@ -316,23 +312,122 @@ namespace RedBlackTree
             return visited;
         }
 
+        public void CLR()
+        {
+            Console.WriteLine("CLR: ");
+            Queue<TreeNode> visited = CenterLeftRight();
+            while (visited.Any())
+            {
+                Console.Write($"{visited.Dequeue().Key} ");
+            }
+            Console.WriteLine();
+        }
+
+        public void LCR()
+        {
+            Console.WriteLine("LCR: ");
+            Queue<TreeNode> visited = LeftCenterRight();
+            while (visited.Any())
+            {
+                Console.Write($"{visited.Dequeue().Key} ");
+            }
+            Console.WriteLine();
+        }
+
+        public void LRC()
+        {
+            Console.WriteLine("LRC: ");
+            Queue<TreeNode> visited = LeftRightCenter();
+            while (visited.Any())
+            {
+                Console.Write($"{visited.Dequeue().Key} ");
+            }
+            Console.WriteLine();
+        }
+
+        private Queue<TreeNode> CenterLeftRight()
+        {
+            Stack<TreeNode> stack = new Stack<TreeNode>();
+            stack.Push(_root);
+
+            Queue<TreeNode> visited = new Queue<TreeNode>();
+
+            while (stack.Any())
+            {
+                TreeNode node = stack.Pop();
+                visited.Enqueue(node);
+
+                if (node.Right != null)
+                {
+                    stack.Push(node.Right);
+                }
+
+                if (node.Left != null)
+                {
+                    stack.Push(node.Left);
+                }
+            }
+
+            return visited;
+        }
+
+        private Queue<TreeNode> LeftCenterRight()
+        {
+            Stack<TreeNode> stack = new Stack<TreeNode>();
+            stack.Push(_root);
+
+            Queue<TreeNode> visited = new Queue<TreeNode>();
+
+            while (stack.Any())
+            {
+                TreeNode node = stack.Pop();
+                if (node == _root.Right) visited.Enqueue(_root);
+                if (node != _root) visited.Enqueue(node);
+
+                if (node.Right != null)
+                {
+                    stack.Push(node.Right);
+                }
+
+                if (node.Left != null)
+                {
+                    stack.Push(node.Left);
+                }
+            }
+
+            return visited;
+        }
+
+        private Queue<TreeNode> LeftRightCenter()
+        {
+            Stack<TreeNode> stack = new Stack<TreeNode>();
+            stack.Push(_root);
+
+            Queue<TreeNode> visited = new Queue<TreeNode>();
+
+            while (stack.Any())
+            {
+                TreeNode node = stack.Pop();
+                if (node != _root) visited.Enqueue(node);
+
+                if (node.Right != null)
+                {
+                    stack.Push(node.Right);
+                }
+
+                if (node.Left != null)
+                {
+                    stack.Push(node.Left);
+                }
+            }
+
+            visited.Enqueue(_root);
+
+            return visited;
+        }
 
 
-        //        • КЛП — «корень - левый - правый» (обход в прямом порядке):
 
-        //посетить корень
-        //обойти левое поддерево
-        //обойти правое поддерево
-        //• ЛКП — «левый - корень - правый» (симметричный обход):
-
-        //обойти левое поддерево
-        //посетить корень
-        //обойти правое поддерево
-        //• ЛПК — «левый - правый - корень» (обход в обратном порядке):
-
-        //обойти левое поддерево
-        //обойти правое поддерево
-        //посетить корень
-
+      
     }
 }

@@ -13,6 +13,9 @@ namespace RedBlackTree
             Console.WriteLine($"Min: {tree.Min().Key}");
             Console.WriteLine($"Max: {tree.Max().Key}");
             tree.BFS();
+            tree.CLR();
+            tree.LCR();
+            tree.LRC();
 
         }
     }
