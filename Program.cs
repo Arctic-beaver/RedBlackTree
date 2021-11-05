@@ -7,9 +7,13 @@ namespace RedBlackTree
         static void Main(string[] args)
         {
             Tree tree = new Tree();
-            //tree.See();
-            //tree.BFS();
-            //tree.SeeCool();
+            tree.SeeCool();
+
+            Console.WriteLine();
+            Console.WriteLine($"Min: {tree.Min().Key}");
+            Console.WriteLine($"Max: {tree.Max().Key}");
+            tree.BFS();
+
         }
     }
 }
