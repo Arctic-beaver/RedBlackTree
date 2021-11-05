@@ -16,15 +16,25 @@ namespace RedBlackTree
         public Tree()
         {
             Insert(4);
+            //SeeCool();
             Insert(45);
+            //SeeCool();
             Insert(34);
+            //SeeCool();
             Insert(23);
-            //Insert(1234);
-            //Insert(9);
-            //Insert(10);
+            //SeeCool();
+            Insert(1234);
+            //SeeCool();
+            Insert(9);
+            //SeeCool();
+            Insert(10);
+            SeeCool();
             //Insert(345);
+            //SeeCool();
             //Insert(0);
+            //SeeCool();
             //Insert(5);
+            //SeeCool();
         }
 
         public void SeeCool()
@@ -93,6 +103,9 @@ namespace RedBlackTree
             }
 
             TreeNode newNode = FindPlaceAndInsert(_root, key);
+            if (newNode.Key == -1) throw new InvalidOperationException("-1!!");
+            SeeCool();
+
             newNode.Color = "Red";
             BalanseAndRepainting(newNode);
 
@@ -119,12 +132,16 @@ namespace RedBlackTree
                     node.Left.Parent = node;
                     node.Left.Left = tmp;
                     tmp.Parent = node.Left;
+
+                    if (tmp.Right != null && tmp.Right.Key >= node.Left.Key)
+                    {
+                        node.Left.Right = tmp.Right;
+                        tmp.Right = null;
+                    }
+
                     return node.Left;
                 }
-                else
-                {
-                    FindPlaceAndInsert(node.Left, value);
-                }
+                return FindPlaceAndInsert(node.Left, value);
             }
             //Случай 2: Вставляемое значение больше или равно значению узла.
             else
@@ -142,14 +159,18 @@ namespace RedBlackTree
                     node.Right.Parent = node;
                     node.Right.Right = tmp;
                     tmp.Parent = node.Right;
+
+                    if (tmp.Left != null && tmp.Left.Key <= node.Right.Key)
+                    {
+                        node.Right.Left = tmp.Left;
+                        tmp.Left = null;
+                    }
+
                     return node.Right;
                 }
-                else
-                {
-                    FindPlaceAndInsert(node.Right, value);
-                }
+
+                return FindPlaceAndInsert(node.Right, value);
             }
-            return null;
         }
 
         private void SwapFamilyColor(TreeNode node)

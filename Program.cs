@@ -9,7 +9,7 @@ namespace RedBlackTree
             Tree tree = new Tree();
             //tree.See();
             //tree.BFS();
-            tree.SeeCool();
+            //tree.SeeCool();
         }
     }
 }
