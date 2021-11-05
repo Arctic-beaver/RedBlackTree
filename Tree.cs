@@ -16,17 +16,17 @@ namespace RedBlackTree
         public Tree()
         {
             Insert(4);
-            //SeeCool();
+            SeeCool();
             Insert(45);
-            //SeeCool();
+            SeeCool();
             Insert(34);
-            //SeeCool();
+            SeeCool();
             Insert(23);
-            //SeeCool();
+            SeeCool();
             Insert(1234);
-            //SeeCool();
+            SeeCool();
             Insert(9);
-            //SeeCool();
+            SeeCool();
             Insert(10);
             SeeCool();
             //Insert(345);
@@ -93,6 +93,50 @@ namespace RedBlackTree
             return parent;
         }
 
+        private void TreeRotateR(TreeNode child, TreeNode parent)
+        {
+            parent.Left = child.Right;
+            child.Right = parent;
+            child.Color = parent.Color;
+            parent.Color = "Red";
+            if (_root == parent) _root = child;
+
+            ChangeParent(child, parent);
+        }
+
+
+        private void TreeRotateL(TreeNode child, TreeNode parent)
+        {
+            //левосторонний поворот просходит только тогда, когда цвет childNode - красный
+            parent.Right = child.Left;
+            child.Left = parent;
+            child.Color = parent.Color;
+            parent.Color = "Red";
+            if (_root == parent) _root = child;
+
+            ChangeParent(child, parent);
+        }
+
+
+
+        private void ChangeParent(TreeNode child, TreeNode parent)
+        {
+            if (parent.Parent != null)
+            {
+                TreeNode grandParent = parent.Parent;
+                if (grandParent.Left == parent) grandParent.Left = child;
+                else grandParent.Right = child;
+
+                child.Parent = grandParent;
+                parent.Parent = child;
+            }
+            else
+            {
+                child.Parent = null;
+                parent.Parent = child;
+            }
+        }
+
         public void Insert(int key)
         {
             if (_root == null)
@@ -105,9 +149,69 @@ namespace RedBlackTree
             TreeNode newNode = FindPlaceAndInsert(_root, key);
             if (newNode.Key == -1) throw new InvalidOperationException("-1!!");
             SeeCool();
-
             newNode.Color = "Red";
-            BalanseAndRepainting(newNode);
+            TreeNode y;
+            while (newNode != _root && newNode.Parent.Color == "Red")
+            {
+                if (newNode.Parent == newNode.Parent.Parent.Left)
+                {
+                    y = newNode.Parent.Parent.Right;
+                    if (y != null)
+                    {
+                        if (y.Color == "Red")
+                        {
+                            newNode.Parent.Color = "Black";
+                            y.Color = "Black";
+                            newNode.Parent.Parent.Color = "Red";
+                            newNode = newNode.Parent.Parent;
+                        }
+                        else
+                        {
+                            if (newNode == newNode.Parent.Right)
+                            {
+                                newNode = newNode.Parent;
+                                TreeRotateL(newNode.Left, newNode);
+                            }
+
+                            newNode.Parent.Color = "Black";
+                            newNode.Parent.Parent.Color = "Red";
+                            TreeRotateR(newNode.Parent, newNode.Parent.Parent);
+                        }
+                    }
+                    
+                } else
+                {
+                    
+                    y = newNode.Parent.Parent.Left;
+                    if (y != null)
+                    {
+                        if (y.Color == "Red")
+                        {
+                            newNode.Parent.Color = "Black";
+                            y.Color = "Black";
+                            newNode.Parent.Parent.Color = "Red";
+                            newNode = newNode.Parent.Parent;
+                        }
+                        else
+                        {
+                            if (newNode == newNode.Parent.Left)
+                            {
+                                newNode = newNode.Parent;
+                                TreeRotateL(newNode.Right, newNode);
+                            }
+
+                            newNode.Parent.Color = "Black";
+                            newNode.Parent.Parent.Color = "Red";
+                            TreeRotateR(newNode.Parent, newNode.Parent.Parent);
+                        }
+                    }
+                    
+                }
+                _root.Color = "Black";
+            }
+
+
+           // BalanseAndRepainting(newNode);
 
             AmountOfElements++;
         }
@@ -125,22 +229,6 @@ namespace RedBlackTree
                     node.Left.Parent = node;
                     return node.Left;
                 }
-                if (node.Left.Key < value)
-                {
-                    TreeNode tmp = node.Left;
-                    node.Left = new TreeNode(value);
-                    node.Left.Parent = node;
-                    node.Left.Left = tmp;
-                    tmp.Parent = node.Left;
-
-                    if (tmp.Right != null && tmp.Right.Key >= node.Left.Key)
-                    {
-                        node.Left.Right = tmp.Right;
-                        tmp.Right = null;
-                    }
-
-                    return node.Left;
-                }
                 return FindPlaceAndInsert(node.Left, value);
             }
             //Случай 2: Вставляемое значение больше или равно значению узла.
@@ -152,23 +240,6 @@ namespace RedBlackTree
                     node.Right.Parent = node;
                     return node.Right;
                 }
-                if (node.Right.Key > value)
-                {
-                    TreeNode tmp = node.Right;
-                    node.Right = new TreeNode(value);
-                    node.Right.Parent = node;
-                    node.Right.Right = tmp;
-                    tmp.Parent = node.Right;
-
-                    if (tmp.Left != null && tmp.Left.Key <= node.Right.Key)
-                    {
-                        node.Right.Left = tmp.Left;
-                        tmp.Left = null;
-                    }
-
-                    return node.Right;
-                }
-
                 return FindPlaceAndInsert(node.Right, value);
             }
         }
@@ -191,91 +262,13 @@ namespace RedBlackTree
             else node.Color = "Red";
         }
 
-        private void LeftHandTurn(TreeNode child, TreeNode parent)
-        {
-            //левосторонний поворот просходит только тогда, когда цвет childNode - красный
-            parent.Right = child.Left;
-            child.Left = parent;
-            child.Color = parent.Color;
-            parent.Color = "Red";
-            if (_root == parent) _root = child;
-
-            ChangeParent(child, parent);
-        }
-
-        private void RightHandTurn(TreeNode child, TreeNode parent)
-        {
-            parent.Left = child.Right;
-            child.Right = parent;
-            child.Color = parent.Color;
-            parent.Color = "Red";
-            if (_root == parent) _root = child;
-
-            ChangeParent(child, parent);
-        }
-
-        private void ChangeParent(TreeNode child, TreeNode parent)
-        {
-            if (parent.Parent != null)
-            {
-                TreeNode grandParent = parent.Parent;
-                if (grandParent.Left == parent) grandParent.Left = child;
-                else grandParent.Right = child;
-
-                child.Parent = grandParent;
-                parent.Parent = child;
-            }
-            else
-            {
-                child.Parent = null;
-                parent.Parent = child;
-            }
-        }
+        
 
         private void BalanseAndRepainting(TreeNode insertedNode)
         {
-            //если левая нода красная и левая нода левой ноды красная - правосторонний поворот
-            //если правая нода красная и правая нода правой ноды красная - левосторонний поворот
-            //если левая нода красная и правосторонняя нода красная -делаем свап цвета.
-            if (insertedNode == _root) return;
+            // 1. Дядя добавляемого узла красный
 
-            TreeNode parent = insertedNode.Parent;
-            if (parent.Color == "Black" && 
-                (parent.Left != null && parent.Left.Color == "Red") && 
-                (parent.Right != null && parent.Right.Color == "Red") &&
-                (!(parent.Parent != null && parent.Parent.Color == "Red")))
-            {
-                SwapFamilyColor(parent);
-                return;
-            }
 
-            if (insertedNode.Color == "Red")
-            {
-                if (parent.Color == "Red")
-                {
-                    if (parent.Left == insertedNode)
-                    {
-                        RightHandTurn(parent, parent.Parent);
-                    }
-                    else
-                    {
-                        LeftHandTurn(parent, parent.Parent);
-                    }
-                    return;
-                }
-
-                if (insertedNode.Left != null && insertedNode.Left.Color == "Red")
-                {
-                    RightHandTurn(insertedNode, parent);
-                    return;
-                }
-
-                if (insertedNode.Right != null && insertedNode.Right.Color == "Red")
-                {
-                    LeftHandTurn(insertedNode, parent);
-                    return;
-                }
-            }
         }
 
         public void BFS()
