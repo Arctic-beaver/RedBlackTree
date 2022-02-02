@@ -340,68 +340,68 @@ namespace RedBlackTree
             {
                 if (iMustBeDead.Color == "Black")
                 {
-                    KillChildlessNiger(iMustBeDead);
+                    DeleteBlackNodeNoChildren(iMustBeDead);
                 }
-                else KillChildlessRedskin(iMustBeDead);
+                else DeleteChildlessRedNode(iMustBeDead);
                 return true;
             }
             if (iMustBeDead.Left != null ^ iMustBeDead.Right != null)
             {
                 if (iMustBeDead.Color == "Black")
                 {
-                    KillNigerWithOneChild(iMustBeDead);
+                    DeleteBlackNodeOneChild(iMustBeDead);
                 }
-                else KillRedskinWithOneChild(iMustBeDead);
+                else DeleteRedNodeWithOneChild(iMustBeDead);
                 return true;
             }
             if (iMustBeDead.Left != null && iMustBeDead.Right != null)
             {
                 if (iMustBeDead.Color == "Black")
                 {
-                    KillProlificNiger(iMustBeDead);
+                    DeleteProlificBlackNode(iMustBeDead);
                 }
-                else KillProlificRedSkin(iMustBeDead);
+                else DeleteProlificRedNode(iMustBeDead);
             }
             return false;
         }
 
-        private void KillChildlessNiger(TreeNode ouYesKillMe)
+        private void DeleteBlackNodeNoChildren(TreeNode deleting)
         {
-            if (ouYesKillMe.Parent.Left != null ^ ouYesKillMe.Parent.Right != null)
+            if (deleting.Parent.Left != null ^ deleting.Parent.Right != null)
             {
                 //один ребёнок в семье
-                if (ouYesKillMe.Parent.Color == "Red")
+                if (deleting.Parent.Color == "Red")
                 {
-                    ouYesKillMe.Parent.Color = "Black";
+                    deleting.Parent.Color = "Black";
                 }
                 else 
                 {
-                    if (ouYesKillMe.Parent.Parent.Left == ouYesKillMe.Parent)
+                    if (deleting.Parent.Parent.Left == deleting.Parent)
                     {
-                        LeftHandTurn(ouYesKillMe.Parent.Parent.Right, ouYesKillMe.Parent.Parent);
+                        LeftHandTurn(deleting.Parent.Parent.Right, deleting.Parent.Parent);
                     }
-                    else RightHandTurn(ouYesKillMe.Parent.Parent.Left, ouYesKillMe.Parent.Parent);
+                    else RightHandTurn(deleting.Parent.Parent.Left, deleting.Parent.Parent);
                 }
             }
 
             //если их два и у удаляемого нет детей, ничто не поменяется
-            if (ouYesKillMe.Parent.Left == ouYesKillMe) ouYesKillMe.Parent.Left = null;
-            else ouYesKillMe.Parent.Right = null;
+            if (deleting.Parent.Left == deleting) deleting.Parent.Left = null;
+            else deleting.Parent.Right = null;
         }
 
-        private void KillNigerWithOneChild(TreeNode ouYesKillMe)
+        private void DeleteBlackNodeOneChild(TreeNode deleting)
         {
-            TreeNode child = ouYesKillMe.Right ?? ouYesKillMe.Left;
-            TreeNode parent = ouYesKillMe.Parent;
+            TreeNode child = deleting.Right ?? deleting.Left;
+            TreeNode parent = deleting.Parent;
 
-            KillRedskinWithOneChild(ouYesKillMe);
+            DeleteRedNodeWithOneChild(deleting);
             //Это мы убрали сам узел. теперь восстановим цвета.
 
             TreeNode brother = GetBrother(child);
             
             if (brother.Color == "Black")
             {
-                KillNiggerOneChildBrotherIsBlack(child, brother, parent);
+                DeleteBlackNodeOneChildBrotherIsBlack(child, brother, parent);
                 return;
             }
 
@@ -419,26 +419,26 @@ namespace RedBlackTree
                 brother.Color = "Black";
                 parent.Color = "Red";
 
-                KillNiggerOneChildBrotherIsBlack(child, brother, parent);
+                DeleteBlackNodeOneChildBrotherIsBlack(child, brother, parent);
                 return;
             }
         }
 
-        private void KillNiggerOneChildBrotherIsBlack(TreeNode child, TreeNode brother, TreeNode parent)
+        private void DeleteBlackNodeOneChildBrotherIsBlack(TreeNode child, TreeNode brother, TreeNode parent)
         {
             //Случай 1: отец красный, брат черный, дети брата,  если таковые есть, чёрные
 
             if (parent.Color == "Red" && (brother.Left == null || brother.Left.Color == "Black")
                 && (brother.Right == null || brother.Right.Color == "Black"))
             {
-                KillNiggerOneChildSit1(child, brother, parent);
+                DeleteBlackNodeOneChildSit1(child, brother, parent);
                 return;
             }
 
             //Случай 2: брат черный, его правый сын красный, цвет отца не важен
             if (brother.Right != null && brother.Right.Color == "Red")
             {
-                KillNiggerOneChildSit2(child, brother, parent);
+                DeleteBlackNodeOneChildSit2(child, brother, parent);
                 return;
             }
 
@@ -451,7 +451,7 @@ namespace RedBlackTree
                 brother.Left.Color = "Black";
                 brother.Color = "Red";
 
-                KillNiggerOneChildSit2(child, brother, parent);
+                DeleteBlackNodeOneChildSit2(child, brother, parent);
                 return;
             }
             //Случай 4: Вся семья чёрная
@@ -462,13 +462,13 @@ namespace RedBlackTree
             }
         }
 
-        private void KillNiggerOneChildSit1(TreeNode child, TreeNode brother, TreeNode parent)
+        private void DeleteBlackNodeOneChildSit1(TreeNode child, TreeNode brother, TreeNode parent)
         {
             parent.Color = "Black";
             brother.Color = "Red";
         }
 
-        private void KillNiggerOneChildSit2(TreeNode child, TreeNode brother, TreeNode parent)
+        private void DeleteBlackNodeOneChildSit2(TreeNode child, TreeNode brother, TreeNode parent)
         {
             string tmp = parent.Color;
             parent.Color = brother.Color;
@@ -486,60 +486,60 @@ namespace RedBlackTree
             brother.Right.Color = "Black";
         }
 
-        private void KillProlificNiger(TreeNode ouYesKillMe)
+        private void DeleteProlificBlackNode(TreeNode deleting)
         {
-            TreeNode maxOfLeftSubtree = Max(ouYesKillMe.Left);
+            TreeNode maxOfLeftSubtree = Max(deleting.Left);
 
-            ouYesKillMe.Key = maxOfLeftSubtree.Key;
+            deleting.Key = maxOfLeftSubtree.Key;
             
             if (maxOfLeftSubtree.Color == "Black")
             {
-                KillChildlessNiger(maxOfLeftSubtree);
+                DeleteBlackNodeNoChildren(maxOfLeftSubtree);
             }
             else
             {
-                KillChildlessRedskin(maxOfLeftSubtree);
+                DeleteChildlessRedNode(maxOfLeftSubtree);
             }
         }
 
-        private void KillChildlessRedskin(TreeNode ouYesKillMe)
+        private void DeleteChildlessRedNode(TreeNode deleting)
         {
-            if (ouYesKillMe.Parent.Left == ouYesKillMe) ouYesKillMe.Parent.Left = null;
-            else ouYesKillMe.Parent.Right = null;
+            if (deleting.Parent.Left == deleting) deleting.Parent.Left = null;
+            else deleting.Parent.Right = null;
         }
 
-        private void KillRedskinWithOneChild(TreeNode ouYesKillMe)
+        private void DeleteRedNodeWithOneChild(TreeNode deleting)
         {
-            if (ouYesKillMe.Parent.Left == ouYesKillMe)
+            if (deleting.Parent.Left == deleting)
             {
-                if (ouYesKillMe.Left != null)
+                if (deleting.Left != null)
                 {
-                    ouYesKillMe.Parent.Left = ouYesKillMe.Left;
+                    deleting.Parent.Left = deleting.Left;
                 }
                 else
                 {
-                    ouYesKillMe.Parent.Left = ouYesKillMe.Right;
+                    deleting.Parent.Left = deleting.Right;
                 }
             }
             else
             {
-                if (ouYesKillMe.Left != null)
+                if (deleting.Left != null)
                 {
-                    ouYesKillMe.Parent.Right = ouYesKillMe.Left;
+                    deleting.Parent.Right = deleting.Left;
                 }
                 else
                 {
-                    ouYesKillMe.Parent.Right = ouYesKillMe.Right;
+                    deleting.Parent.Right = deleting.Right;
                 }
             }
         }
 
-        private void KillProlificRedSkin(TreeNode ouYesKillMe)
+        private void DeleteProlificRedNode(TreeNode deleting)
         {
-            TreeNode maxOfLeftSubtree = Max(ouYesKillMe.Left);
+            TreeNode maxOfLeftSubtree = Max(deleting.Left);
 
-            ouYesKillMe.Key = maxOfLeftSubtree.Key;
-            KillChildlessRedskin(maxOfLeftSubtree);
+            deleting.Key = maxOfLeftSubtree.Key;
+            DeleteChildlessRedNode(maxOfLeftSubtree);
         }
 
 
@@ -687,9 +687,5 @@ namespace RedBlackTree
 
             return visited;
         }
-
-
-
-      
     }
 }
